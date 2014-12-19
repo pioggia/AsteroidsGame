@@ -17,13 +17,16 @@ public class AsteroidsGame extends PApplet {
 Star[] field;
 ArrayList <Asteroid> belt;
 ArrayList <Bullet> storm;
-boolean airlock, leftAirlock, rightAirlock;
+boolean airlock, leftAirlock, rightAirlock, breached, shields, warp;
 Vessel swordFishII = new Vessel();
 public void setup() 
 {
   airlock = false;
   leftAirlock=false;
   rightAirlock=false;
+  breached=false;
+  shields=false;
+  warp=false;
   background(9, 20, 21);
   size(800, 600);
   field = new Star[55];
@@ -40,50 +43,86 @@ public void setup()
 }
 public void draw() 
 {
+  System.out.println(warp);
   background(9, 20, 21);
   for(int i = 0; i<storm.size(); i++)
   {
     storm.get(i).show();
     storm.get(i).move();
+    if(storm.get(i).myCenterX<-15 || storm.get(i).myCenterX>815 || storm.get(i).myCenterY<-15 || storm.get(i).myCenterY>615)
+    {
+      storm.remove(i);
+    }
   }
   for(int i=0; i<field.length; i++)
   {
     field[i].show();
     field[i].glow();
     field[i].wrap();
-    if(field[i].siz<1)
-  {
-    field[i].siz++;
-  }
-  else if(field[i].siz>2)
-  {
-    field[i].siz--;
-  }
-  if(field[i].lume<185)
-  {
-    field[i].lume+=10;
-  }
-  else if(field[i].lume>20)
-  {
-    field[i].lume-=10;
-  }
+    if(field[i].siz<1) //glowing stars (in progress)
+    {
+      field[i].siz++;
+    }
+    else if(field[i].siz>2)
+    {
+      field[i].siz--;
+    }
+    if(field[i].lume<185)
+    {
+      field[i].lume+=10;
+    }
+    else if(field[i].lume>20)
+    {
+      field[i].lume-=10;
+    }
   }
   for(int i=0; i<belt.size(); i++)
   {
     belt.get(i).show();
-    if(dist((float)belt.get(i).myCenterX, (float)belt.get(i).myCenterY, (float)swordFishII.myCenterX, (float)swordFishII.myCenterY) <=30)
-    {
-      belt.remove(i);
-    }
     belt.get(i).move();
     belt.get(i).wrap();
+    if(dist((float)belt.get(i).myCenterX, (float)belt.get(i).myCenterY, (float)swordFishII.myCenterX, (float)swordFishII.myCenterY) <=30)
+    {
+      if(warp==false) //otherwise it is possible to warp and simutaneously wipe out asteroids
+      {
+        belt.remove(i); 
+      }
+      if(shields == false && warp ==false)
+      {
+        breached=true;
+      }
+    }
+    for(int o=0; o<storm.size(); o++)
+    {
+      if(dist((float)belt.get(i).myCenterX, (float)belt.get(i).myCenterY, (float)storm.get(o).myCenterX, (float)storm.get(o).myCenterY) <=10)
+      {
+        belt.remove(i);
+        storm.remove(o);
+      }
+    }
+  }
+  if(shields == false)
+  {
+    swordFishII.myColor=color(240, 46, 46);
+  }
+  else if(shields == true)
+  {
+    swordFishII.myColor=color(98, 210, 189);
   }
   swordFishII.show();
   swordFishII.drift();
-  swordFishII.deployAirlock();
   swordFishII.jump();
+  swordFishII.deployAirlock();
   swordFishII.move();
-  if(airlock==true)
+  if(key == 'p')
+  {
+    for(int i=0; i<240; i++) //for four seconds after engaging warp, ship is immune to damage
+    {
+      warp=true;
+    }
+    warp=false;
+  }
+  if(airlock==true || (breached == true && shields == false && warp == false))
   {
     rect(0, 0, 800, 600);
     fill(240, 46, 46);
@@ -95,7 +134,11 @@ public void keyPressed()
 {
   if(key == ' ')
   {
-    swordFishII.stabilize(); //stops rotation
+    swordFishII.stabilize(); //slows ship
+  }
+  if(key == 'k')
+  {
+    swordFishII.shieldsUp(); //toggles damage, so you can cruise around if you like
   }
   if(key == '[')
   {
@@ -107,7 +150,7 @@ public void keyPressed()
   }
   if(key == 'm')
   {
-    System.out.println("pew pew");
+    //System.out.println("pew pew");
     storm.add(new Bullet(swordFishII));
   }
 }
@@ -134,6 +177,10 @@ class Vessel extends Floater
     rotation = 1.5f;
     acceleration = 0.03f;
   }
+  public void shieldsUp()
+  {
+    shields=!shields;
+  }
   public void deployAirlock() //if both airlock doors are open ( [] is pressed ), ship self-descructs
   {
     if(leftAirlock==true && rightAirlock==true)
@@ -141,29 +188,29 @@ class Vessel extends Floater
       airlock=true;
     }
   }
-  public void jump()
+  public void jump() //"it never occured to me to think of space as the thing that was moving!"
   {
-    if (key == 'p') //press spacebar or any other non-coded key to return to normal space-time
+    if(key=='p')
     {
-      System.out.println("punch it");
-      for(int i = 0; i<100; i++)
-      {
-        rotate(i);
-      }
-      myCenterX=(int)(Math.random()*800);
-      myCenterY=(int)(Math.random()*600);
-      for(int i = 0; i<0; i--)
-      {
-        rotate(i);
-      }
+      //System.out.println("punch it");
+        for(int u = 0; u<100; u++)
+        {
+          rotate(u);
+        }
+        myCenterX=(int)(Math.random()*800);
+        myCenterY=(int)(Math.random()*600);
+        for(int u = 0; u<0; u--)
+        {
+          rotate(u);
+        }
     }
-  }
-  public void stabilize()
-  {
-    for(double i = -acceleration; i<0; i+=0.01f)
+    }
+    public void stabilize()
     {
-      accelerate(i);
-    }
+      for(double i = -acceleration; i<0; i+=0.01f)
+      {
+        accelerate(i);
+      }
     //System.out.println("alrighty");
   }
   public void drift()
@@ -200,6 +247,7 @@ class Bullet extends Floater
 {
   private int myX, myY;
   private int myColor;
+  private double dRadians;
   Bullet(Vessel i)
   {
     myCenterX=swordFishII.myCenterX;
@@ -208,7 +256,7 @@ class Bullet extends Floater
     myX=0; 
     myY=0;
     myPointDirection=swordFishII.myPointDirection;
-    double dRadians = myPointDirection*(Math.PI/180);
+    dRadians = myPointDirection*(Math.PI/180);
     myDirectionX = 5*Math.cos(dRadians) + swordFishII.myDirectionX;
     myDirectionY = 5*Math.sin(dRadians) + swordFishII.myDirectionY;
   }
@@ -219,8 +267,16 @@ class Bullet extends Floater
   }
   public void move()
   {
-    myCenterX=myCenterX+18*Math.cos(myPointDirection);
-    myCenterY=myCenterY+18*Math.sin(myPointDirection);
+    if((myPointDirection/180)%2==0)
+    {
+      myCenterX=myCenterX+18*Math.cos(myPointDirection);
+      myCenterY=myCenterY-18*Math.sin(myPointDirection);
+    }
+    else if((myPointDirection/180)%2!=0)
+    {
+      myCenterX=myCenterX+18*Math.cos(myPointDirection);
+      myCenterY=myCenterY+18*Math.sin(myPointDirection);
+    }
   }
   public void setX(int x) {myX=x;}  
   public int getX() {return myX;}
@@ -411,7 +467,7 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Ve
   }   
   public void show ()  //Draws the floater at the current position  
   {
-    if(airlock == true)
+    if(airlock == true || (breached == true && shields == false))
     {
       noFill();
       noStroke();
