@@ -27,7 +27,6 @@ public void setup()
 }
 public void draw() 
 {
-  System.out.println(warp);
   background(9, 20, 21);
   for(int i = 0; i<storm.size(); i++)
   {
@@ -134,7 +133,6 @@ public void keyPressed()
   }
   if(key == 'm')
   {
-    //System.out.println("pew pew");
     storm.add(new Bullet(swordFishII));
   }
 }
@@ -176,7 +174,6 @@ class Vessel extends Floater
   {
     if(key=='p')
     {
-      //System.out.println("punch it");
         for(int u = 0; u<100; u++)
         {
           rotate(u);
@@ -195,7 +192,6 @@ class Vessel extends Floater
       {
         accelerate(i);
       }
-    //System.out.println("alrighty");
   }
   public void drift()
   {
@@ -346,7 +342,6 @@ class Star
   }
   public void show()
   {
-    //System.out.println(lume);
     fill(255, lume);
     rect(x, y, siz, siz);
     fill(255, lume-50);
