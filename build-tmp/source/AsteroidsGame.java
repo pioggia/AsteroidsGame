@@ -1,3 +1,19 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class AsteroidsGame extends PApplet {
+
 Star[] field;
 ArrayList <Asteroid> belt;
 ArrayList <Bullet> storm;
@@ -115,8 +131,8 @@ class Vessel extends Floater
     xCorners = x;
     yCorners = y;
     mach=5;
-    rotation = 1.5;
-    acceleration = 0.03;
+    rotation = 1.5f;
+    acceleration = 0.03f;
   }
   public void deployAirlock() //if both airlock doors are open ( [] is pressed ), ship self-descructs
   {
@@ -144,7 +160,7 @@ class Vessel extends Floater
   }
   public void stabilize()
   {
-    for(double i = -acceleration; i<0; i+=0.01)
+    for(double i = -acceleration; i<0; i+=0.01f)
     {
       accelerate(i);
     }
@@ -183,7 +199,7 @@ class Vessel extends Floater
 class Bullet extends Floater
 {
   private int myX, myY;
-  private color myColor;
+  private int myColor;
   Bullet(Vessel i)
   {
     myCenterX=swordFishII.myCenterX;
@@ -340,7 +356,7 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Ve
   protected int corners;  //the number of corners, a triangular floater has 3   
   protected int[] xCorners;   
   protected int[] yCorners;   
-  protected color myColor;   
+  protected int myColor;   
   protected double myCenterX, myCenterY; //holds center coordinates   
   protected double myDirectionX, myDirectionY; //holds x and y coordinates of the vector for direction of travel   
   protected double myPointDirection; //holds current direction the ship is pointing in degrees    
@@ -420,3 +436,12 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Ve
     endShape(CLOSE);  
   }   
 } 
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "AsteroidsGame" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
+}
